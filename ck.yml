@@ -1,0 +1,39 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: core-keeper
+spec:
+  ports:
+    - port: 27015
+      targetPort: 27015
+    - port: 27016
+      targetPort: 27016
+  selector:
+    app.kubernetes.io/name: core-keeper
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: core-keeper
+spec:
+  revisionHistoryLimit: 1
+  replicas: 2
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: core-keeper
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: core-keeper
+    spec:
+      imagePullSecrets:
+        - name: logsquaredn-ghcr-pull
+      containers:
+        - name: ck-ops
+          image: ghcr.io/phish3y/ck-ops:c932f1652e9deb316aa988a7b7f82231c2d41284
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 27015
+            - containerPort: 27016
+        
